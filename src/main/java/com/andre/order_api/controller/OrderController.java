@@ -1,13 +1,13 @@
 package com.andre.order_api.controller;
 
 import com.andre.order_api.entity.Order;
+import com.andre.order_api.exception.NotFoundException;
 import com.andre.order_api.service.OrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -24,12 +24,12 @@ public class OrderController {
     }
 
     @GetMapping("/getAll")
-    public List<Order> listAll() {
+    public List<Order> listAll() throws NotFoundException {
         return service.findAll();
     }
 
     @GetMapping("/getOrderById")
-    public Order listOrderById(@RequestParam Long id) {
+    public Order listOrderById(@RequestParam Long id) throws NotFoundException {
         return service.findById(id);
     }
 

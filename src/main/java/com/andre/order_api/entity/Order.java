@@ -23,4 +23,13 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", amount=" + amount +
+                ", customer=" + customer +
+                '}';
+    }
 }

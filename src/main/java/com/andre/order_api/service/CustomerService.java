@@ -1,7 +1,7 @@
 package com.andre.order_api.service;
 
 import com.andre.order_api.entity.Customer;
-import com.andre.order_api.exception.ResourceNotFoundException;
+import com.andre.order_api.exception.NotFoundException;
 import com.andre.order_api.repository.CustomerRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,34 +18,37 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
 
-    public ResponseEntity<Customer> create(Customer customer) {
+    public Customer create(Customer customer) {
        try{
-           customerRepository.save(customer);
-           return ResponseEntity.ok(customer);
+           return customerRepository.save(customer);
        } catch (RuntimeException e) {
-           return ResponseEntity.badRequest().body(customer);
+           throw new RuntimeException("Erro ao criar usuário" + e.getMessage());
        }
     }
 
-    public List<Customer> findAll() {
+    public List<Customer> findAll() throws NotFoundException {
         try {
             return customerRepository.findAll();
         } catch (Exception e) {
-            throw new ResourceNotFoundException("Cliente não encontrado!");
+            throw new NotFoundException("Cliente não encontrado!");
         }
     }
 
-    public Customer findByEmail(String email) {
+    public Customer findByEmail(String email) throws NotFoundException {
         return customerRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
     }
 
     public ResponseEntity<String> deleteById(Long id) {
-        try {
-            customerRepository.deleteById(id);
-            return new ResponseEntity<String>("Excluído com sucesso: " + id, HttpStatus.OK);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<String>("Usuário não encontrado", HttpStatus.NOT_FOUND);
+        try{
+            if (customerRepository.existsById(id)) {
+                customerRepository.deleteById(id);
+                return new ResponseEntity<String>("Excluído com sucesso: " + id, HttpStatus.OK);
+            } else {
+                throw new NotFoundException("Usuário não existe");
+            }
+        } catch (NotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 }
